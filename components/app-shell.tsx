@@ -1,0 +1,8 @@
+'use client';
+import Link from 'next/link';
+import {usePathname} from 'next/navigation';
+import {Home,Users,MessageCircle,Compass,UserRound,BookOpen,Briefcase,ShieldCheck,LogOut} from 'lucide-react';
+import {Brand} from './brand';
+import {browserClient} from '@/lib/supabase/client';
+const nav=[['/comunidade','Comunidade',Home],['/grupos','Grupos',Compass],['/mensagens','Mensagens',MessageCircle],['/amizades','Amizades',Users],['/perfil','Meu perfil',UserRound],['/aprender','Rosa Pro',BookOpen],['/profissionais','Profissionais',Briefcase],['/apoio','Centro de apoio',ShieldCheck]] as const;
+export function AppShell({children,name}:{children:React.ReactNode;name:string}){const path=usePathname();return <div className="app-shell"><aside className="sidebar"><Brand/><nav>{nav.map(([href,label,Icon])=><Link href={href} key={href} className={path===href||path.startsWith(href+'/')?'active':''}><Icon size={19}/>{label}</Link>)}</nav><div className="sidebar-bottom"><img src="/lotus.svg" width="42" alt=""/><b>O seu próximo passo.</b><p>Mais conexões. Mais possibilidades.</p><Link href="/planos" className="button secondary small">Conhecer os planos</Link></div></aside><div><header className="app-topbar"><div className="mobile-brand"><Brand/></div><span>UMA REDE. MUITAS HISTÓRIAS. A SUA TAMBÉM.</span><div><Link href="/planos" className="pill">Planos</Link><Link href="/perfil" className="avatar" aria-label="Meu perfil">{name.slice(0,2).toUpperCase()}</Link><button aria-label="Sair" className="icon-button" onClick={async()=>{await browserClient().auth.signOut();window.location.assign('/')}}><LogOut size={18}/></button></div></header><main className="app-content" id="conteudo">{children}</main></div></div>}

@@ -1,0 +1,4 @@
+import {NextResponse} from 'next/server';
+import {serverClient} from '@/lib/supabase/server';
+import {siteOrigin,stripeClient,validOrigin} from '@/lib/billing';
+export async function POST(req:Request){try{if(!validOrigin(req))return NextResponse.json({error:'Origem inválida.'},{status:403});const c=await serverClient();const{data:{user}}=await c.auth.getUser();if(!user)return NextResponse.json({error:'Entre na sua conta.'},{status:401});const{data}=await c.from('subscriptions').select('stripe_customer_id').eq('user_id',user.id).single();if(!data?.stripe_customer_id)return NextResponse.json({error:'Você ainda não tem uma assinatura vinculada.'},{status:404});const session=await stripeClient().billingPortal.sessions.create({customer:data.stripe_customer_id,return_url:siteOrigin()+'/planos'});return NextResponse.json({url:session.url})}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Portal indisponível.'},{status:503})}}

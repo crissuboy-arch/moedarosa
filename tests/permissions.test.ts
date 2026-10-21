@@ -1,0 +1,4 @@
+import {describe,it,expect} from 'vitest';
+import {canAdvertise,safeRedirect,plans} from '../lib/plans';
+describe('Commercial access boundaries',()=>{it('never allows Pro or expired Business to advertise',()=>{const future=new Date(Date.now()+3600000).toISOString();expect(canAdvertise('pro','active',future)).toBe(false);expect(canAdvertise('business','past_due',future)).toBe(false);expect(canAdvertise('business','active','2020-01-01')).toBe(false);expect(canAdvertise('business','active',null)).toBe(false);expect(canAdvertise('business','active',future)).toBe(true)});it('preserves agreed prices',()=>expect(plans.map(p=>Math.round(p.price*100))).toEqual([0,299,599,1990]))});
+describe('Authentication redirects',()=>{it.each(['https://evil.test','//evil.test','/\\evil.test',null])('rejects external redirect %s',path=>expect(safeRedirect(path)).toBe('/comunidade'));it('allows internal reset flow',()=>expect(safeRedirect('/redefinir')).toBe('/redefinir'))});
